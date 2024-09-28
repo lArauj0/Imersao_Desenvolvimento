@@ -1,0 +1,5 @@
+.my_class {
+    -webkit-box-shadow: 10px 10px 16px 0px rgba(57,57,245,1);
+    -moz-box-shadow: 10px 10px 16px 0px rgba(57,57,245,1);
+    box-shadow: 10px 10px 16px 0px rgba(57,57,245,1);
+}

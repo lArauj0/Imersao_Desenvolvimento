@@ -1,0 +1,45 @@
+{% extends "myapp/index.html" %}
+
+{% block title %}Atualizar Equipamento{% endblock title %}
+
+{% block content %}
+{% if erro %}
+<div class="alert alert-warning" style="animation: fadeOut 5s forwards;">
+    <strong>Aviso!</strong> Você não preencheu algo obrigatório!
+</div>
+
+<style>
+    @keyframes fadeOut {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            display: none;
+        }
+    }
+</style>
+{% else %}
+    <div class="container justify-content-center mt-4">
+        <div class="card my_class" style="max-width: 500px; margin: auto;">
+            <div class="card-header text-center">
+                <h1>Atualizar Equipamento</h1>
+            </div>
+            <div class="card-body">
+                <form action={% url "atualizar_equipamento" item.id %} method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-2">
+                        <label for="nome">Nome</label>
+                        <input class="form-control" type="text" name="nome" id="nome" value="{{ item.nome }}">
+                        <label for="tipo">Tipo</label>
+                        <input class="form-control" type="text" name="tipo" id="tipo" value="{{ itemTipo }}">
+                        <label for="quantidade">Quantidade</label>
+                        <input class="form-control" type="number" name="quantidade" id="quantidade" value="{{ itemQuantidade }}">
+                    </div>
+                    <input class="btn btn-success" type="submit" value="Atualizar">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock content %}

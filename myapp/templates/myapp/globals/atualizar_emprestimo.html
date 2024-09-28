@@ -1,0 +1,47 @@
+{% extends "myapp/index.html" %}
+
+{% block title %}Status Emprestimo{% endblock title %}
+
+{% block content %}
+{% if erro %}
+<div class="alert alert-warning" style="animation: fadeOut 5s forwards;">
+    <strong>Erro</strong> {{ erro }}
+</div>
+
+<style>
+    @keyframes fadeOut {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            display: none;
+        }
+    }
+</style>
+{% endif %}
+    <div class="container justify-content-center mt-4">
+        <div class="card my_class" style="max-width: 500px; margin: auto;">
+            <div class="card-header text-center">
+                <h1>Atualizar Emprestimo</h1>
+            </div>
+            <div class="card-body">
+                <form action={% url "atualizar_emprestimo" item.id %} method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-2">
+                        <label for="nome">Status</label>
+                        <select class="form-control mb-2" name="status">
+                            <option value="Emprestado" {% if item.status %}selected{% endif %}>Emprestado</option>
+                            <option value="Devolvido" {% if not item.status %}selected{% endif %}>Devolvido</option>
+                        </select>
+                        
+                    </div>
+                    <input class="btn btn-success" type="submit" value="Editar">
+                </form>
+    
+                
+            </div>
+            
+        </div>
+    </div>
+{% endblock content %}

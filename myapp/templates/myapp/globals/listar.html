@@ -1,0 +1,97 @@
+{% extends "myapp/index.html" %}
+
+{% block title %}Home{% endblock title %}
+
+{% block content %}
+<form action="{% url 'listar_emprestimo' %}" method="get">
+    <div class="form-group">
+        <label class="form-label" for="nome">Pesquisa:</label>
+        <input class="form-control" type="text" name="nome" id="nome">
+    </div>
+    <input class="btn btn-success mt-1" type="submit" value="Pesquisar">
+</form>
+
+
+
+{% if lista_emprestimo %}
+
+<div class="container mt-3">
+    <h1 class="text-center">Listar Emprestimos</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Data emprestimo</th>
+                <th>Data de devolução</th>
+                <th>Equipamento</th>
+                <th>Colaborador</th>
+                <th>Quantidade</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+           {% for item in lista_emprestimo %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.data_emprestimo }}</td>
+                <td>{{ item.data_devolucao }}</td>
+                <td>{{ item.equipamento }}</td>
+                <td>{{ item.colaborador }}</td>
+                <td>{{ item.quantidade_equipamento }}</td>
+                <td>{{ item.status }}</td>
+                <td>
+                    <a href="/atualizar/{{ item.id }}" class="btn btn-primary">Editar</a>
+                
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+
+<div class="container mt-3">
+    <p class="text-center h2">Nenhum empréstimo encontrado</p>
+</div>
+
+{% endif %}
+{% if lista_equipamentos %}
+
+ <div class="container mt-3">
+     <h1 class="text-center">Listar Equipamentos</h1>
+     <table class="table table-striped">
+         <thead>
+             <tr>
+                 <th>Id</th>
+                 <th>Nome</th>
+                 <th>Tipo</th>
+                 <th>Quantidade</th>
+                 <th>Ações</th>
+             </tr>
+         </thead>
+         <tbody>
+            {% for item in lista_equipamentos %}
+             <tr>
+                 <td>{{ item.id }}</td>
+                 <td>{{ item.nome }}</td>
+                 <td>{{ item.tipo }}</td>
+                 <td>{{ item.quantidade }}</td>
+                 <td>
+                     <a href="/atualizar_equipamento/{{ item.id }}" class="btn btn-primary">Editar</a>
+                 
+                 </td>
+             </tr>
+             {% endfor %}
+         </tbody>
+     </table>
+ </div>
+ {% else %}
+
+ <div class="container mt-3">
+     <p class="text-center h2">Nenhum equipamento encontrado</p>
+ </div>
+
+ {% endif %}
+             
+{% endblock content %}

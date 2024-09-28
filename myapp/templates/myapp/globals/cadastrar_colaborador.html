@@ -1,0 +1,40 @@
+{% extends "myapp/index.html" %}
+
+{% block title %}Cadastro Colaborador{% endblock title %}
+
+{% block content %}
+    <div class="container justify-content-center mt-4">
+        <div class="card my_class" style="max-width: 500px; margin: auto;">
+            <div class="card-header text-center">
+                <h1>Cadastrar Colaborador</h1>
+            </div>
+            <div class="card-body">
+                
+                {% if ultimo_nome %}
+                    <p>Nome do ultimo colaborador cadastrado: {{ ultimo_nome }}</p>
+                {% endif %}
+    
+                <form action="/adicionar/" method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-2">
+                        <label for="nome">Nome</label>
+                        <input class="form-control" type="text" name="nome" placeholder="Nome">
+                    </div>
+                    
+                    <div class="form-group mb-2">
+                        <label for="data_nascimento">Data de Nascimento</label>
+                        <input class="form-control" type="date" name="data_nascimento" id="data_nascimento" required>
+                    </div>
+                    
+                    <div class="form-group mb-2">
+                        <label for="email">Email</label>
+                        <input class="form-control" type="email" name="email" placeholder="Email">
+                    </div>
+                    <input class="btn btn-success" type="submit" value="Enviar">
+                </form>
+    
+                
+            </div>
+        </div>
+    </div>
+{% endblock content %}
