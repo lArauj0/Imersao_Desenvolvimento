@@ -197,12 +197,7 @@ def criar_emprestimo(request):
         # Salva as alterações no equipamento
         equipamento_obj.save()
         
-        messages.append("Empréstimo realizado com sucesso.")
-        return render(request, 'myapp/globals/cadastrar_emprestimo.html', {
-            "colaboradores": colaboradores,
-            "equipamentos": equipamentos,
-            "messages": messages
-        })
+        return redirect(listar_emprestimo)
 
     return render(request, 'myapp/globals/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
 
