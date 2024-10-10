@@ -1,4 +1,5 @@
-{% extends "myapp/index.html" %}
+
+{% extends "globals/index.html" %}
 
 {% block title %}Cadastro Equipamento{% endblock title %}
 
@@ -20,7 +21,9 @@
                         <label for="quantidade">Quantidade</label>
                         <input class="form-control mb-2" type="number" name="quantidade" placeholder="Quantidade" >
                     </div>
-                    <input class="btn btn-success" type="submit" value="Enviar">
+                    <div class="form-group mb-2 text-center">
+                        <input class="btn btn-success" type="submit" value="Cadastrar">
+                    </div>
                 </form>
     
                 

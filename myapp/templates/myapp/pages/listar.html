@@ -1,4 +1,4 @@
-{% extends "myapp/index.html" %}
+{% extends "globals/index.html" %}
 
 {% block title %}Home{% endblock title %}
 
@@ -12,11 +12,8 @@
 </form>
 
 
-
-{% if lista_emprestimo %}
-
 <div class="container mt-3">
-    <h1 class="text-center">Listar Emprestimos</h1>
+    <h1 class="text-center">Lista de Emprestimos</h1>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -45,53 +42,57 @@
                 
                 </td>
             </tr>
+           
+            {% empty %}
+            <tr>
+            <td colspan="4">
+            Nenhum empréstimo realizado!
+            </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
-{% else %}
 
 <div class="container mt-3">
-    <p class="text-center h2">Nenhum empréstimo encontrado</p>
-</div>
-
-{% endif %}
-{% if lista_equipamentos %}
-
- <div class="container mt-3">
-     <h1 class="text-center">Listar Equipamentos</h1>
-     <table class="table table-striped">
-         <thead>
-             <tr>
-                 <th>Id</th>
-                 <th>Nome</th>
-                 <th>Tipo</th>
-                 <th>Quantidade</th>
-                 <th>Ações</th>
-             </tr>
-         </thead>
-         <tbody>
+    <h1 class="text-center">Lista de Equipamentos</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for item in lista_equipamentos %}
-             <tr>
-                 <td>{{ item.id }}</td>
-                 <td>{{ item.nome }}</td>
-                 <td>{{ item.tipo }}</td>
-                 <td>{{ item.quantidade }}</td>
-                 <td>
-                     <a href="/atualizar_equipamento/{{ item.id }}" class="btn btn-primary">Editar</a>
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.nome }}</td>
+                <td>{{ item.tipo }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>
+                    <a href="/atualizar_equipamento/{{ item.id }}" class="btn btn-primary">Editar</a>
+                    <a href="/deletar_equipamento/{{ item.id }}" class="btn btn-danger">Deletar</a>
                  
-                 </td>
-             </tr>
-             {% endfor %}
-         </tbody>
-     </table>
- </div>
- {% else %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+            <td colspan="4">
+            Nenhum equipamento cadastrado!
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<footer class="bg-light text-right py-3">
+    <div class="container">
+        <a href="/" class="nav-link">Topo da página</a>
+    </div>
+</footer>
 
- <div class="container mt-3">
-     <p class="text-center h2">Nenhum equipamento encontrado</p>
- </div>
-
- {% endif %}
-             
 {% endblock content %}

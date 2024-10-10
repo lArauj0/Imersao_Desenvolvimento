@@ -1,4 +1,4 @@
-{% extends "myapp/index.html" %}
+{% extends "globals/index.html" %}
 
 {% block title %}Emprestimo{% endblock title %}
 
@@ -47,7 +47,9 @@
                             <option value="Devolvido">Devolvido</option>
                         </select>
                     </div>
-                    <input class="btn btn-success" type="submit" value="Enviar">
+                    <div class="form-group mb-2 text-center">
+                        <input class="btn btn-success" type="submit" value="Cadastrar">
+                    </div>
                 </form>
             </div>
         </div>

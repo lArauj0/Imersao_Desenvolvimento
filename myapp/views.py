@@ -2,7 +2,8 @@ from django.contrib import messages
 from datetime import datetime
 from django.shortcuts import render, redirect
 from myapp.models import Colaborador, Equipamento, Emprestimo
-from django import forms
+from django.contrib.auth.decorators import login_required, permission_required
+
 
 
 # Create your views here.
@@ -58,12 +59,9 @@ def listar_emprestimo(request):
         'lista_emprestimo': emprestimos,
         'lista_equipamentos': equipamentos
     }
-    return render(request, 'myapp/globals/listar.html', context)
+    return render(request, 'myapp/pages/listar.html', context)
 
-    
-    #return render(request, 'myapp/globals/listar.html', {"lista_emprestimo": emprestimos}, {"lista_equipamentos": equipamentos})
-    #excluir depois
-
+@permission_required('myapp.criar_colaboradores', raise_exception=True)
 def criar_colaborador(request):
     nome = None
     if request.method == 'POST':
@@ -76,9 +74,9 @@ def criar_colaborador(request):
             Colaborador.objects.create(nome=nome, data_nascimento=data_nascimento, email=email)
             return redirect(listar_emprestimo)
     
-    return render(request, 'myapp/globals/cadastrar_colaborador.html', {"ultimo_nome": nome})
+    return render(request, 'myapp/pages/cadastrar_colaborador.html', {"ultimo_nome": nome})
 
-
+@permission_required('myapp.criar_equipamentos', raise_exception=True)
 def criar_equipamento(request):
     nome = None
     if request.method == 'POST':
@@ -88,8 +86,9 @@ def criar_equipamento(request):
         if nome and tipo and quantidade:
             Equipamento.objects.create(nome=nome, tipo=tipo, quantidade=quantidade)
             return redirect(listar_emprestimo)
-    return render(request, 'myapp/globals/cadastrar_equipamento.html', {"ultimo_nome": nome})
+    return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
 
+@permission_required('myapp.atualizar_equipamentos' , raise_exception=True)
 def atualizar_equipamento(request, id):
     item = Equipamento.objects.get(id=id)
     if request.method == 'POST':
@@ -102,7 +101,7 @@ def atualizar_equipamento(request, id):
             try:
                 itemQuantidade = int(itemQuantidade_str)  # Converte a quantidade para inteiro
             except ValueError:
-                return render(request, 'myapp/globals/atualizar_equipamento.html', {
+                return render(request, 'myapp/pages/atualizar_equipamento.html', {
                     "item": item,
                     "erro": "A quantidade deve ser um número válido."
                 })
@@ -115,14 +114,20 @@ def atualizar_equipamento(request, id):
 
             return redirect(listar_emprestimo)  # Redireciona para a lista de empréstimos
         else:
-            return render(request, 'myapp/globals/atualizar_equipamento.html', {
+            return render(request, 'myapp/pages/atualizar_equipamento.html', {
                 "item": item,
                 "erro": "Por favor, preencha todos os campos."
             })
 
-    return render(request, 'myapp/globals/atualizar_equipamento.html', {"item": item})
+    return render(request, 'myapp/pages/atualizar_equipamento.html', {"item": item})
 
+@permission_required('myapp.deletar_equipamentos', raise_exception=True)
+def deletar_equipamento(request, id):
+    item = Equipamento.objects.get(id=id)
+    item.delete()
+    return redirect(listar_emprestimo)
 
+@permission_required('myapp.criar_emprestimos', raise_exception=True)
 def criar_emprestimo(request):
     colaboradores = None
     equipamentos = None
@@ -130,7 +135,7 @@ def criar_emprestimo(request):
     if request.method == 'GET':
         colaboradores = Colaborador.objects.all()
         equipamentos = Equipamento.objects.all()
-        return render(request, 'myapp/globals/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
+        return render(request, 'myapp/pages/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
 
     elif request.method == 'POST':
         data_emprestimo = request.POST.get('data_emprestimo')
@@ -169,7 +174,7 @@ def criar_emprestimo(request):
         if messages:
             colaboradores = Colaborador.objects.all()  # Recarrega os colaboradores
             equipamentos = Equipamento.objects.all()  # Recarrega os equipamentos
-            return render(request, 'myapp/globals/cadastrar_emprestimo.html', {
+            return render(request, 'myapp/pages/cadastrar_emprestimo.html', {
                 "colaboradores": colaboradores,
                 "equipamentos": equipamentos,
                 "messages": messages
@@ -199,8 +204,8 @@ def criar_emprestimo(request):
         
         return redirect(listar_emprestimo)
 
-    return render(request, 'myapp/globals/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
-
+    return render(request, 'myapp/pages/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
+@permission_required('myapp.atualizar_emprestimos', raise_exception=True)
 def atualizar_emprestimo(request, id):
     emprestimo = Emprestimo.objects.get(id=id)
     equipamento = emprestimo.equipamento  # Obtém o equipamento associado ao empréstimo
@@ -229,12 +234,12 @@ def atualizar_emprestimo(request, id):
 
             return redirect(listar_emprestimo)  # Redireciona para a lista de empréstimos
         else:
-            return render(request, 'myapp/globals/atualizar_emprestimo.html', {
+            return render(request, 'myapp/pages/atualizar_emprestimo.html', {
                 "item": emprestimo,
                 "erro": "Por favor, selecione um status."
             })
 
-    return render(request, 'myapp/globals/atualizar_emprestimo.html', {"item": emprestimo})
+    return render(request, 'myapp/pages/atualizar_emprestimo.html', {"item": emprestimo})
 
 def lista_colaboradores(request):
     colaboradores = Colaborador.objects.all()
@@ -252,4 +257,4 @@ def lista_equipamentos(request):
     if nome:
         equipamentos = equipamentos.filter(nome__icontains=nome)
 
-    return render(request, 'myapp/globals/listar.html', {"equipamentos": equipamentos})
+    return render(request, 'myapp/pages/listar.html', {"equipamentos": equipamentos})

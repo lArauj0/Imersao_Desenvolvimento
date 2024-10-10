@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-sm bg-light justify-content-center">
-    <ul class="navbar-nav">
+    <ul class="navbar-nav me-auto">
         <li class="nav-item">
             <a class="nav-link" href="/">Lista</a>
         </li>      
@@ -12,6 +12,19 @@
         <li class = "nav-item">
             <a class="nav-link" href="/criar_equipamento">Cadastrar Equipamento</a"></a>
         </li>
-        
+    </ul>
+    <ul class="navbar-nav ms-auto">
+        {% if request.user.is_authenticated %}
+        <li class="nav-item">
+           <p class="nav-link">{{ request.user.username }}</p>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout_usuario' %}">Logout</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'login_usuario' %}">Login</a>
+        </li>      
+        {% endif %}
     </ul>
 </nav>
