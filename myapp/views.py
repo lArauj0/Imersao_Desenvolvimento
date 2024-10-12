@@ -61,7 +61,7 @@ def listar_emprestimo(request):
     }
     return render(request, 'myapp/pages/listar.html', context)
 
-@permission_required('myapp.criar_colaboradores', raise_exception=True)
+@permission_required('myapp.criar_colaboradores',login_url='/login/login/', raise_exception=True)
 def criar_colaborador(request):
     nome = None
     if request.method == 'POST':
@@ -76,7 +76,7 @@ def criar_colaborador(request):
     
     return render(request, 'myapp/pages/cadastrar_colaborador.html', {"ultimo_nome": nome})
 
-@permission_required('myapp.criar_equipamentos', raise_exception=True)
+@permission_required('myapp.criar_equipamentos',login_url='/login/login/', raise_exception=True)
 def criar_equipamento(request):
     nome = None
     if request.method == 'POST':
@@ -88,7 +88,7 @@ def criar_equipamento(request):
             return redirect(listar_emprestimo)
     return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
 
-@permission_required('myapp.atualizar_equipamentos' , raise_exception=True)
+@permission_required('myapp.atualizar_equipamentos' ,login_url='/login/login/', raise_exception=True)
 def atualizar_equipamento(request, id):
     item = Equipamento.objects.get(id=id)
     if request.method == 'POST':
@@ -121,13 +121,13 @@ def atualizar_equipamento(request, id):
 
     return render(request, 'myapp/pages/atualizar_equipamento.html', {"item": item})
 
-@permission_required('myapp.deletar_equipamentos', raise_exception=True)
+@permission_required('myapp.deletar_equipamentos',login_url='/login/login/', raise_exception=True)
 def deletar_equipamento(request, id):
     item = Equipamento.objects.get(id=id)
     item.delete()
     return redirect(listar_emprestimo)
 
-@permission_required('myapp.criar_emprestimos', raise_exception=True)
+@permission_required('myapp.criar_emprestimos',login_url='/login/login/', raise_exception=True)
 def criar_emprestimo(request):
     colaboradores = None
     equipamentos = None
@@ -205,7 +205,7 @@ def criar_emprestimo(request):
         return redirect(listar_emprestimo)
 
     return render(request, 'myapp/pages/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
-@permission_required('myapp.atualizar_emprestimos', raise_exception=True)
+@permission_required('myapp.atualizar_emprestimos',login_url='/login/login/', raise_exception=True)
 def atualizar_emprestimo(request, id):
     emprestimo = Emprestimo.objects.get(id=id)
     equipamento = emprestimo.equipamento  # Obtém o equipamento associado ao empréstimo
