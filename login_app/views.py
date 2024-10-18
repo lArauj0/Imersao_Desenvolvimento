@@ -18,10 +18,6 @@ def criar_usuario(request):
                                     email=email,
                                     first_name=nome,
                                     last_name=sobrenome)
-            permissoes_codenames = ['deletar_colaboradores', 'editar_colaboradores', 'criar_colaboradores']
-            permissoes = Permission.objects.filter(codename__in=permissoes_codenames)
-            user.user_permissions.add(*permissoes)
-            user.save()
         return render(request, 'login_app/pages/login.html')
     return render(request, 'login_app/pages/cadastrar.html')
 

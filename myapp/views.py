@@ -61,6 +61,7 @@ def listar_emprestimo(request):
     }
     return render(request, 'myapp/pages/listar.html', context)
 
+@login_required(login_url='/login/login/')
 @permission_required('myapp.criar_colaboradores',login_url='/login/login/', raise_exception=True)
 def criar_colaborador(request):
     nome = None
@@ -76,6 +77,7 @@ def criar_colaborador(request):
     
     return render(request, 'myapp/pages/cadastrar_colaborador.html', {"ultimo_nome": nome})
 
+@login_required(login_url='/login/login/')
 @permission_required('myapp.criar_equipamentos',login_url='/login/login/', raise_exception=True)
 def criar_equipamento(request):
     nome = None
@@ -88,6 +90,7 @@ def criar_equipamento(request):
             return redirect(listar_emprestimo)
     return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
 
+@login_required(login_url='/login/login/')
 @permission_required('myapp.atualizar_equipamentos' ,login_url='/login/login/', raise_exception=True)
 def atualizar_equipamento(request, id):
     item = Equipamento.objects.get(id=id)
@@ -121,12 +124,14 @@ def atualizar_equipamento(request, id):
 
     return render(request, 'myapp/pages/atualizar_equipamento.html', {"item": item})
 
+@login_required(login_url='/login/login/')
 @permission_required('myapp.deletar_equipamentos',login_url='/login/login/', raise_exception=True)
 def deletar_equipamento(request, id):
     item = Equipamento.objects.get(id=id)
     item.delete()
     return redirect(listar_emprestimo)
 
+@login_required(login_url='/login/login/')
 @permission_required('myapp.criar_emprestimos',login_url='/login/login/', raise_exception=True)
 def criar_emprestimo(request):
     colaboradores = None
@@ -205,6 +210,8 @@ def criar_emprestimo(request):
         return redirect(listar_emprestimo)
 
     return render(request, 'myapp/pages/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
+
+@login_required(login_url='/login/login/')
 @permission_required('myapp.atualizar_emprestimos',login_url='/login/login/', raise_exception=True)
 def atualizar_emprestimo(request, id):
     emprestimo = Emprestimo.objects.get(id=id)
