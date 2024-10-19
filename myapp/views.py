@@ -26,9 +26,15 @@ def listar_emprestimo(request):
         values_equipamentos = Equipamento.objects.filter(
             nome__icontains=nome
         )
+
+        # Filtra colaboradores com base no nome
+        values_colaboradores = Colaborador.objects.filter(
+            nome__icontains=nome
+        )
     else:
         values = Emprestimo.objects.select_related('colaborador', 'equipamento').all()
         values_equipamentos = Equipamento.objects.all()
+        values_colaboradores = Colaborador.objects.all()
 
     # Processa os empréstimos filtrados
     emprestimos = []
@@ -55,9 +61,18 @@ def listar_emprestimo(request):
         }
         equipamentos.append(equipamento)
 
+    colaboradores = []
+    for value in values_colaboradores:
+        colaborador = {
+            'id': value.id,
+            'nome': value.nome,
+            'email': value.email,
+        }
+        colaboradores.append(colaborador)
     context = {
         'lista_emprestimo': emprestimos,
-        'lista_equipamentos': equipamentos
+        'lista_equipamentos': equipamentos,
+        'lista_colaboradores': colaboradores,
     }
     return render(request, 'myapp/pages/listar.html', context)
 
@@ -70,12 +85,42 @@ def criar_colaborador(request):
         data_nascimento = request.POST.get('data_nascimento')  # Captura a data de nascimento
         email = request.POST.get('email')
         
-        if nome and data_nascimento and email:
-            # Cria o colaborador com a data de nascimento
-            Colaborador.objects.create(nome=nome, data_nascimento=data_nascimento, email=email)
+        if nome and email and data_nascimento:  # Verifica se todos os campos estão preenchidos
+            try:
+                colaborador = Colaborador(nome=nome, email=email, data_nascimento=data_nascimento)
+                colaborador.save()
+                messages.success(request, 'Colaborador cadastrado com sucesso!')
+                return redirect('home')  # Redireciona para a página inicial ou outra página
+            except Exception:
+                ...
+        else:
+            messages.error(request, 'Por favor, preencha todos os campos.')
+            messages.get_messages(request) 
+
+    return render(request, 'myapp/pages/cadastrar_colaborador.html')
+
+
+@login_required(login_url='/login/login/')
+@permission_required('myapp.atualizar_colaboradores',login_url='/login/login/', raise_exception=True)
+def atualizar_colaborador(request, id):
+    item = Colaborador.objects.get(id=id)
+    if request.method == 'POST':
+        itemNome = request.POST.get('nome')
+        itemEmail = request.POST.get('email') 
+        
+        if itemNome and itemEmail:
+            itemNome = itemNome
+            itemEmail = itemEmail
+            item.save()
             return redirect(listar_emprestimo)
-    
-    return render(request, 'myapp/pages/cadastrar_colaborador.html', {"ultimo_nome": nome})
+    return render(request, 'myapp/pages/atualizar_colaborador.html', {"item": item})
+
+@login_required(login_url='/login/login/')
+@permission_required('myapp.deletar_colaboradores',login_url='/login/login/', raise_exception=True)
+def deletar_colaborador(request, id):
+    item = Colaborador.objects.get(id=id)
+    item.delete()
+    return redirect(listar_emprestimo)
 
 @login_required(login_url='/login/login/')
 @permission_required('myapp.criar_equipamentos',login_url='/login/login/', raise_exception=True)
@@ -87,7 +132,7 @@ def criar_equipamento(request):
         quantidade = request.POST.get('quantidade')
         if nome and tipo and quantidade:
             Equipamento.objects.create(nome=nome, tipo=tipo, quantidade=quantidade)
-            return redirect(listar_emprestimo)
+            return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
     return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
 
 @login_required(login_url='/login/login/')
@@ -251,11 +296,11 @@ def atualizar_emprestimo(request, id):
 def lista_colaboradores(request):
     colaboradores = Colaborador.objects.all()
     nome = request.GET.get('nome')
-    print("aleluia")
+    print(nome)
     if nome:
         colaboradores = colaboradores.filter(nome__icontains=nome)
 
-    return colaboradores
+    return render(request, 'myapp/pages/listar.html', {"colaboradores": colaboradores})
 
 
 def lista_equipamentos(request):

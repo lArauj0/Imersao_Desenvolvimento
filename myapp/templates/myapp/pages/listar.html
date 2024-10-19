@@ -1,6 +1,6 @@
 {% extends "globals/index.html" %}
 
-{% block title %}Home{% endblock title %}
+{% block title %}Listas{% endblock title %}
 
 {% block content %}
 <form action="{% url 'listar_emprestimo' %}" method="get">
@@ -83,6 +83,37 @@
             <tr>
             <td colspan="4">
             Nenhum equipamento cadastrado!
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="container mt-3">
+    <h1 class="text-center">Lista de Colaboradores</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in lista_colaboradores %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.nome }}</td>
+                <td>
+                    <a href="/atualizar_colaborador/{{ item.id }}" class="btn btn-primary">Editar</a>
+                    <a href="/deletar_colaborador/{{ item.id }}" class="btn btn-danger">Deletar</a>
+                 
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+            <td colspan="4">
+            Nenhum colaborador cadastrado!
             </td>
             </tr>
             {% endfor %}
