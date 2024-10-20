@@ -120,7 +120,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# AUTH_USER_MODEL = 'login_app.MyUser'
+
+# Configurações de mídia
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Outras configurações
+STATIC_URL = '/static/'
+
+
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",

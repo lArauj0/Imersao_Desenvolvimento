@@ -87,6 +87,7 @@ def criar_equipamento(request):
         quantidade = request.POST.get('quantidade')
         if nome and tipo and quantidade:
             Equipamento.objects.create(nome=nome, tipo=tipo, quantidade=quantidade)
+            messages.success(request, 'Equipamento cadastrado com sucesso!')
             return redirect(listar_emprestimo)
     return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
 
@@ -114,7 +115,7 @@ def atualizar_equipamento(request, id):
             item.tipo = itemTipo  # Atribuição correta do tipo
             item.quantidade = itemQuantidade  # Atribuição correta da quantidade
             item.save()  # Salva as alterações no banco de dados
-
+            
             return redirect(listar_emprestimo)  # Redireciona para a lista de empréstimos
         else:
             return render(request, 'myapp/pages/atualizar_equipamento.html', {

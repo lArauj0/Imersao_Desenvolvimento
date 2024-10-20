@@ -4,7 +4,9 @@ from django.contrib.auth import authenticate, login, logout
 from myapp.views import listar_emprestimo
 from django.contrib.auth.models import Group, Permission
 
-# Create your views here.
+# login_app/views.py
+from django.contrib import messages
+
 def criar_usuario(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
@@ -12,13 +14,22 @@ def criar_usuario(request):
         email = request.POST.get('email')
         username = request.POST.get('username')
         password = request.POST.get('password')
-        if all([nome,sobrenome, email, username, password]):
-            user = User.objects.create_user(username=username,
-                                    password=password,
-                                    email=email,
-                                    first_name=nome,
-                                    last_name=sobrenome)
-        return render(request, 'login_app/pages/login.html')
+        foto_url = request.POST.get('foto_url')  # Pega a URL da foto
+
+        # Criar o usuário
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password)
+            user.first_name = nome
+            user.last_name = sobrenome
+            user.profile.foto_url = foto_url  # Salvar a URL da foto no campo do perfil
+            user.save()
+
+            messages.success(request, 'Usuário cadastrado com sucesso!')
+            return redirect('listar_emprestimo')  # Redireciona para a página inicial ou outra página após o cadastro
+        except Exception as e:
+            messages.error(request, 'Erro ao cadastrar o usuário: {}'.format(e))
+
+    print("Acessou a view criar_usuario")
     return render(request, 'login_app/pages/cadastrar.html')
 
 def login_usuario(request):

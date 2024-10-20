@@ -5,6 +5,14 @@
 {% block content %}
 <form action="{% url 'listar_emprestimo' %}" method="get">
     <div class="form-group">
+        {% if messages %}
+        <div class="alert alert-success" role="alert">
+            {% for message in messages %}
+               {{ message.message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+    
         <label class="form-label" for="nome">Pesquisa:</label>
         <input class="form-control" type="text" name="nome" id="nome">
     </div>
@@ -55,27 +63,23 @@
 </div>
 
 <div class="container mt-3">
-    <h1 class="text-center">Lista de Equipamentos</h1>
+    <h1 class="text-center">Lista de Colaboradores</h1>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Id</th>
                 <th>Nome</th>
-                <th>Tipo</th>
-                <th>Quantidade</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in lista_equipamentos %}
+            {% for item in lista_colaboradores %}
             <tr>
                 <td>{{ item.id }}</td>
                 <td>{{ item.nome }}</td>
-                <td>{{ item.tipo }}</td>
-                <td>{{ item.quantidade }}</td>
                 <td>
-                    <a href="/atualizar_equipamento/{{ item.id }}" class="btn btn-primary">Editar</a>
-                    <a href="/deletar_equipamento/{{ item.id }}" class="btn btn-danger">Deletar</a>
+                    <a href="/atualizar_colaborador/{{ item.id }}" class="btn btn-primary">Editar</a>
+                    <a href="/deletar_colaborador/{{ item.id }}" class="btn btn-danger">Deletar</a>
                  
                 </td>
             </tr>

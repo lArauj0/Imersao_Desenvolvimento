@@ -3,13 +3,17 @@
 {% block title %}Cadastrar Usuários{% endblock title %}
 
 {% block content %}
-
 <div class="container justify-content-center mt-4">
     <div class="card my_class" style="max-width: 500px; margin: auto;">
         <div class="card-header text-center">
             <h1>Cadastrar Usuários</h1>
         </div>
         <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
             <form action="{% url 'criar_usuario' %}" method="post">
                 {% csrf_token %}
                 <div class="form-group mb-2">
@@ -31,6 +35,10 @@
                 <div class="form-group mb-2">
                     <label for="password">Password</label>
                     <input type="password" class="form-control" name="password" id="password" required>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="foto_url">URL da Foto</label>
+                    <input type="url" class="form-control" name="foto_url" id="foto_url" placeholder="https://exemplo.com/sua_foto.jpg" required>
                 </div>
                 <div class="form-group mb-2 text-center">
                     <input class="btn btn-success" type="submit" value="Cadastrar">

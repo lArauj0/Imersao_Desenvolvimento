@@ -4,22 +4,29 @@
             <a class="nav-link" href="/">Lista</a>
         </li>      
         <li class="nav-item">
-            <a class="nav-link" href="/emprestimo">Fazer Emprestimo</a"></a>
+            <a class="nav-link" href="/emprestimo">Fazer Empréstimo</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/adicionar">Cadastrar Colaborador</a>
         </li>
-        <li class = "nav-item">
-            <a class="nav-link" href="/criar_equipamento">Cadastrar Equipamento</a"></a>
+        <li class="nav-item">
+            <a class="nav-link" href="/criar_equipamento">Cadastrar Equipamento</a>
         </li>
     </ul>
     <ul class="navbar-nav ms-auto">
         {% if request.user.is_authenticated %}
         <li class="nav-item">
-           <p class="nav-link">{{ request.user.username }}</p>
+            <p class="nav-link">{{ request.user.username }}</p>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'logout_usuario' %}">Logout</a>
+        </li>
+        <li class="nav-item">
+            {% if request.user.profile.foto_url %}
+                <img src="{{ request.user.profile.foto_url }}" alt="Foto de {{ request.user.username }}" style="width: 50px; height: 50px; border-radius: 50%;">
+            {% else %}
+                <p class="nav-link">Foto não disponível.</p>
+            {% endif %}
         </li>
         {% else %}
         <li class="nav-item">
