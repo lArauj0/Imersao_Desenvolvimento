@@ -13,6 +13,10 @@ from .models import Emprestimo, Colaborador, Equipamento
 def listar_emprestimo(request):
     nome = request.GET.get('nome', '').strip()  # Pega o valor da pesquisa
 
+    values_colaboradores = []
+    values_equipamentos = []
+    values = []
+
     # Usar select_related para otimizar consultas
     if nome:
         # Filtra empréstimos com base no nome do equipamento ou colaborador
@@ -24,6 +28,11 @@ def listar_emprestimo(request):
         
         # Filtra equipamentos com base no nome
         values_equipamentos = Equipamento.objects.filter(
+            nome__icontains=nome
+        )
+
+        # Filtra colaboradores com base no nome
+        values_colaboradores = Colaborador.objects.filter(
             nome__icontains=nome
         )
     else:
@@ -55,9 +64,18 @@ def listar_emprestimo(request):
         }
         equipamentos.append(equipamento)
 
+    colaboradores = []
+    for value in values_colaboradores:
+        colaborador = {
+            'id': value.id,
+            'nome': value.nome,
+            'email': value.email,
+        }
+        colaboradores.append(colaborador)
     context = {
         'lista_emprestimo': emprestimos,
-        'lista_equipamentos': equipamentos
+        'lista_equipamentos': equipamentos,
+        'lista_colaboradores': colaboradores,
     }
     return render(request, 'myapp/pages/listar.html', context)
 
@@ -77,6 +95,22 @@ def criar_colaborador(request):
     
     return render(request, 'myapp/pages/cadastrar_colaborador.html', {"ultimo_nome": nome})
 
+def atualizar_colaborador(request, id):
+    item = Colaborador.objects.get(id=id)
+    if request.method == 'POST':
+        itemNome = request.POST.get('nome')
+        itemDataNascimento = request.POST.get('data_nascimento')  # Captura a data de nascimento
+        itemEmail = request.POST.get('email')
+        
+        if itemNome and itemDataNascimento and itemEmail:
+            # Cria o colaborador com a data de nascimento
+            item.nome = itemNome
+            item.data_nascimento = itemDataNascimento
+            item.email = itemEmail
+            item.save()
+            return redirect(listar_emprestimo)
+    return render(request, 'myapp/pages/atualizar_colaborador.html', {"item": item})
+
 @login_required(login_url='/login/login/')
 @permission_required('myapp.criar_equipamentos',login_url='/login/login/', raise_exception=True)
 def criar_equipamento(request):
@@ -85,10 +119,17 @@ def criar_equipamento(request):
         nome = request.POST.get('nome')
         tipo = request.POST.get('tipo')
         quantidade = request.POST.get('quantidade')
+        
         if nome and tipo and quantidade:
-            Equipamento.objects.create(nome=nome, tipo=tipo, quantidade=quantidade)
-            messages.success(request, 'Equipamento cadastrado com sucesso!')
-            return redirect(listar_emprestimo)
+            # Verifica se já existe um equipamento com o mesmo nome e tipo
+            if Equipamento.objects.filter(nome=nome).exists():
+                messages.error(request, 'Equipamento já cadastrado com este nome!')
+            else:
+                # Cria o equipamento se não houver duplicidade
+                Equipamento.objects.create(nome=nome, tipo=tipo, quantidade=quantidade)
+                messages.success(request, 'Equipamento cadastrado com sucesso!')
+                return redirect(listar_emprestimo)
+    
     return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
 
 @login_required(login_url='/login/login/')
@@ -252,11 +293,10 @@ def atualizar_emprestimo(request, id):
 def lista_colaboradores(request):
     colaboradores = Colaborador.objects.all()
     nome = request.GET.get('nome')
-    print("aleluia")
     if nome:
         colaboradores = colaboradores.filter(nome__icontains=nome)
 
-    return colaboradores
+    return render(request, 'myapp/pages/listar.html', {"colaboradores": colaboradores})
 
 
 def lista_equipamentos(request):

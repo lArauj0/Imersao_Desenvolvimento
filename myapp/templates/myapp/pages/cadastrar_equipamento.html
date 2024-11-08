@@ -1,4 +1,3 @@
-
 {% extends "globals/index.html" %}
 
 {% block title %}Cadastro Equipamento{% endblock title %}
@@ -10,30 +9,27 @@
                 <h1>Cadastrar Equipamento</h1>
             </div>
             {% if messages %}
-        <div class="alert alert-success" role="alert">
-            {% for message in messages %}
-               {{ message.message }}
-            {% endfor %}
-        </div>
-        {% endif %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% endif %}" role="alert">
+                        {{ message.message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <div class="card-body">
-    
                 <form action="/criar_equipamento/" method="post">
                     {% csrf_token %}
                     <div class="form-group mb-2">
                         <label for="nome">Nome</label>
-                        <input class="form-control mb-2" type="text" name="nome" placeholder="Nome" >
+                        <input class="form-control mb-2" type="text" name="nome" placeholder="Nome">
                         <label for="tipo">Tipo</label>
-                        <input class="form-control mb-2" type="text" name="tipo" placeholder="Tipo" >
+                        <input class="form-control mb-2" type="text" name="tipo" placeholder="Tipo">
                         <label for="quantidade">Quantidade</label>
-                        <input class="form-control mb-2" type="number" name="quantidade" placeholder="Quantidade" >
+                        <input class="form-control mb-2" type="number" name="quantidade" placeholder="Quantidade">
                     </div>
                     <div class="form-group mb-2 text-center">
                         <input class="btn btn-success" type="submit" value="Cadastrar">
                     </div>
                 </form>
-    
-                
             </div>
         </div>
     </div>

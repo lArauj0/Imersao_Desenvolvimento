@@ -1,0 +1,54 @@
+{% extends "globals/index.html" %}
+
+{% block title %}Atualizar Colaborador{% endblock title %}
+
+{% block content %}
+{% if erro %}
+<div class="alert alert-warning" style="animation: fadeOut 5s forwards;">
+    <strong>Aviso!</strong> Você não preencheu algo obrigatório!
+</div>
+
+<style>
+    @keyframes fadeOut {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            display: none;
+        }
+    }
+</style>
+{% else %}
+    <div class="container justify-content-center mt-4">
+        <div class="card my_class" style="max-width: 500px; margin: auto;">
+            <div class="card-header text-center">
+                <h1>Atualizar Colaborador</h1>
+            </div>
+            <div class="card-body">
+                <form action={% url "atualizar_colaborador" colaborador.id %} method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-2">
+                        <label for="nome">Nome</label>
+                        <input class="form-control" type="text" name="nome" id="nome" value="{{ colaborador.nome }}">
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="data_nascimento">Data de Nascimento</label>
+                        <input class="form-control" type="date" name="data_nascimento" id="data_nascimento" value="{{ colaborador.data_nascimento }}" required>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="email">Email</label>
+                        <input class="form-control" type="email" name="email" id="email" value="{{ colaborador.email }}">
+                    </div>
+
+                    <div class="form-group mb-2 text-center">
+                        <input class="btn btn-success" type="submit" value="Atualizar">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock content %}
