@@ -6,9 +6,9 @@
 
 <!-- Pesquisa -->
 <form action="{% url 'listar_emprestimo' %}" method="get">
-    <div class="form-group">
+    <div class="form-group col-md-2">
         <label class="form-label" for="nome">Pesquisa:</label>
-        <input class="form-control" type="text" name="nome" id="nome">
+        <input class="form-control" type="text" name="nome" id="nome" placeholder="Nome">
     </div>
     <input class="btn btn-success mt-1" type="submit" value="Pesquisar">
 </form>
@@ -30,10 +30,12 @@
                     <thead class="table-dark">
                         <tr>
                             <th>Data empréstimo</th>
+                            <th>Data prévia de devolução</th>
                             <th>Data de devolução</th>
-                            <th>Equipamento</th>
                             <th>Colaborador</th>
+                            <th>Equipamento</th>
                             <th>Quantidade</th>
+                            <th>Observação</th>
                             <th>Status</th>
                             <th>Ações</th>
                         </tr>
@@ -42,10 +44,12 @@
                         {% for item in lista_emprestimo %}
                         <tr>
                             <td>{{ item.data_emprestimo }}</td>
+                            <td>{{ item.data_prevista_devolucao }}</td>
                             <td>{{ item.data_devolucao }}</td>
-                            <td>{{ item.equipamento }}</td>
                             <td>{{ item.colaborador }}</td>
+                            <td>{{ item.equipamento }}</td>
                             <td>{{ item.quantidade_equipamento }}</td>
+                            <td>{{ item.observacao }}</td>
                             <td>{{ item.status }}</td>
                             <td>
                                 <a href="/atualizar/{{ item.id }}" class="btn btn-primary">Editar</a>
@@ -92,6 +96,10 @@
                             <td>{{ item.quantidade }}</td>
                             <td>
                                 <a href="/atualizar_equipamento/{{ item.id }}" class="btn btn-primary">Editar</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ item.id }}" data-type="equipamento">
+                                    Deletar
+                                </button>
+                                
                             </td>
                         </tr>
                         {% empty %}
@@ -130,6 +138,10 @@
                             <td>{{ item.email }}</td>
                             <td>
                                 <a href="/atualizar_colaborador/{{ item.id }}" class="btn btn-primary">Editar</a>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ item.id }}" data-type="colaborador">
+                                    Deletar
+                                </button>
+                                
                             </td>
                         </tr>
                         {% empty %}
@@ -144,23 +156,48 @@
     </div>
 </div>
 
-<!-- Modal de Confirmação -->
+<!-- Modal de Confirmação de Exclusão -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar exclusão</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Você tem certeza de que deseja deletar este item?
+                Tem certeza de que deseja excluir este item? Esta ação não pode ser desfeita.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger">Confirmar</button>
+                <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Deletar</a>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;  // O botão que disparou o evento
+        var id = button.getAttribute('data-id');  // ID do item
+        var type = button.getAttribute('data-type');  // Tipo do item (emprestimo, equipamento ou colaborador)
+        var deleteUrl = '';  // URL de exclusão
+
+        // Define a URL de exclusão para cada tipo de item
+        if (type === 'emprestimo') {
+            deleteUrl = '/deletar_emprestimo/' + id;
+        } else if (type === 'equipamento') {
+            deleteUrl = '/deletar_equipamento/' + id;
+        } else if (type === 'colaborador') {
+            deleteUrl = '/deletar_colaborador/' + id;
+        }
+
+        // Atualiza o link de exclusão no botão do modal
+        var confirmDeleteBtn = confirmDeleteModal.querySelector('#confirmDeleteBtn');
+        confirmDeleteBtn.setAttribute('href', deleteUrl);
+    });
+</script>
+
+
 
 {% endblock content %}
