@@ -3,23 +3,13 @@
 {% block title %}Atualizar Equipamento{% endblock title %}
 
 {% block content %}
-{% if erro %}
-<div class="alert alert-warning" style="animation: fadeOut 5s forwards;">
-    <strong>Aviso!</strong> Você não preencheu algo obrigatório!
-</div>
-
-<style>
-    @keyframes fadeOut {
-        0% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 0;
-            display: none;
-        }
-    }
-</style>
-{% else %}
+{% if messages %}
+    <div class="alert alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
     <div class="container justify-content-center mt-4">
         <div class="card my_class" style="max-width: 500px; margin: auto;">
             <div class="card-header text-center">
@@ -41,5 +31,4 @@
             </div>
         </div>
     </div>
-{% endif %}
 {% endblock content %}

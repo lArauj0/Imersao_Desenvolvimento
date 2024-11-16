@@ -1,7 +1,7 @@
 {% extends "globals/index.html" %} 
 {% load static %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Home{% endblock title %}
 
 {% block content %}
 <header>
@@ -14,49 +14,45 @@
     <p>Oferecemos os melhores equipamentos de proteção para sua segurança e bem-estar.</p>
 </div>
 
+<div class="container mt-3">
+    <h1 class="text-center">Lista de Equipamentos</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in lista_equipamentos %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.nome }}</td>
+                <td>{{ item.tipo }}</td>
+                <td>{{ item.quantidade }}</td>
+                <td>
+                    <a href="/atualizar_equipamento/{{ item.id }}" class="btn btn-primary">Editar</a>
+                    <a href="/deletar_equipamento/{{ item.id }}" class="btn btn-danger">Deletar</a>
+                 
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+            <td colspan="4">
+            Nenhum equipamento cadastrado!
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<footer class="bg-light text-right py-3">
+    <div class="container">
+        <a href="/" class="nav-link">Topo da página</a>
+    </div>
+</footer>
 
-{% endblock %}
-
-{% block styles %}
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-image: url('{% static "img/imagem_fundo.jpg" %}');
-        background-size: cover;
-        background-position: center;
-        margin: 0;
-        padding: 0;
-        text-align: center;
-    }
-    header {
-        background-color: rgba(0, 77, 153, 0.7); /* Cor do fundo com transparência */
-        color: white;
-        padding: 20px 0;
-    }
-    header h1 {
-        margin: 0;
-    }
-    .logo {
-        width: 200px;
-        margin-top: 20px;
-    }
-    .content {
-        padding: 50px;
-        background-color: rgba(255, 255, 255, 0.8); /* Fundo branco semi-transparente */
-    }
-    .btn {
-        background-color: #008CBA;
-        color: white;
-        padding: 15px 25px;
-        border: none;
-        text-transform: uppercase;
-        font-size: 16px;
-        cursor: pointer;
-        text-decoration: none;
-        border-radius: 5px;
-    }
-    .btn:hover {
-        background-color: #005f73;
-    }
-</style>
-{% endblock %}
+{% endblock content %}
