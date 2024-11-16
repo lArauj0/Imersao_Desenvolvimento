@@ -1,47 +1,82 @@
 {% extends "globals/index.html" %}
 
-{% block title %}Status Emprestimo{% endblock title %}
+{% block title %}Atualizar Emprestimo{% endblock title %}
 
 {% block content %}
 {% if erro %}
-<div class="alert alert-warning" style="animation: fadeOut 5s forwards;">
-    <strong>Erro</strong> {{ erro }}
-</div>
+        <div class="alert alert-warning" style="animation: fadeOut 5s forwards;">
+            <strong>Aviso!</strong> {{ erro }}
+        </div>
+        
+        <style>
+            @keyframes fadeOut {
+                0% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0;
+                    display: none;
+                }
+            }
+        </style>
+    {% endif %}
 
-<style>
-    @keyframes fadeOut {
-        0% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 0;
-            display: none;
-        }
-    }
-</style>
-{% endif %}
-    <div class="container justify-content-center mt-4">
-        <div class="card my_class" style="max-width: 500px; margin: auto;">
-            <div class="card-header text-center">
-                <h1>Atualizar Emprestimo</h1>
-            </div>
-            <div class="card-body">
-                <form action={% url "atualizar_emprestimo" item.id %} method="post">
-                    {% csrf_token %}
-                    <div class="form-group mb-2">
-                        <label for="nome">Status</label>
-                        <select class="form-control mb-2" name="status">
-                            <option value="Emprestado" {% if item.status %}selected{% endif %}>Emprestado</option>
-                            <option value="Devolvido" {% if not item.status %}selected{% endif %}>Devolvido</option>
-                        </select>
-                        
-                    </div>
-                    <input class="btn btn-success" type="submit" value="Editar">
-                </form>
-    
-                
-            </div>
-            
+<div class="container justify-content-center mt-4">
+    <div class="card my_class" style="max-width: 500px; margin: auto;">
+        <div class="card-header text-center">
+            <h1>Atualizar Empréstimo</h1>
+        </div>
+        <div class="card-body">
+            <form action={% url "atualizar_emprestimo" item.id %} method="post">
+                {% csrf_token %}
+                <div class="form-group mb-2">
+                    <label for="status">Status</label>
+                    <select class="form-control mb-2" name="status" id="status" onchange="showHideFields()">
+                        <!-- Status "Emprestado", "Em uso" e "Fornecido" aparecem normalmente -->
+                        <option value="Emprestado" {% if item.status == "Emprestado" %}selected{% endif %}>Emprestado</option>
+                        <option value="Em uso" {% if item.status == "Em uso" %}selected{% endif %}>Em uso</option>
+                        <option value="Fornecido" {% if item.status == "Fornecido" %}selected{% endif %}>Fornecido</option>
+
+                        <!-- Status "Devolvido", "Danificado" e "Perdido" apenas na edição -->
+                        <option value="Devolvido" {% if item.status == "Devolvido" %}selected{% endif %}>Devolvido</option>
+                        <option value="Danificado" {% if item.status == "Danificado" %}selected{% endif %}>Danificado</option>
+                        <option value="Perdido" {% if item.status == "Perdido" %}selected{% endif %}>Perdido</option>
+                    </select>
+                </div>
+
+                <!-- Campos exibidos apenas para status específicos -->
+                <div class="form-group mb-2" id="data_devolucao_field" style="display: none;">
+                    <label for="data_devolucao">Data da Devolução</label>
+                    <input type="date" class="form-control mb-2" name="data_devolucao" id="data_devolucao" value="{{ item.data_devolucao }}">
+                </div>
+
+                <div class="form-group" id="observacao_field" style="display: none;">
+                    <label for="observacao">Observação na Devolução:</label>
+                    <textarea class="form-control" id="observacao" name="observacao">{{ item.observacao|default:"Sem observação" }}</textarea>
+                </div>
+
+                <input class="btn btn-success" type="submit" value="Editar">
+            </form>
         </div>
     </div>
+</div>
+
+<script>
+    // Função para mostrar ou ocultar campos dependendo do status
+    function showHideFields() {
+        var status = document.getElementById("status").value;
+        if (status == "Devolvido" || status == "Danificado" || status == "Perdido") {
+            document.getElementById("data_devolucao_field").style.display = "block";
+            document.getElementById("observacao_field").style.display = "block";
+        } else {
+            document.getElementById("data_devolucao_field").style.display = "none";
+            document.getElementById("observacao_field").style.display = "none";
+        }
+    }
+
+    // Chama a função ao carregar a página para verificar o status atual
+    window.onload = function() {
+        showHideFields();
+    }
+</script>
 {% endblock content %}

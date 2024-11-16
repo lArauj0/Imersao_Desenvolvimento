@@ -2,4 +2,197 @@
     -webkit-box-shadow: 10px 10px 16px 0px rgba(57,57,245,1);
     -moz-box-shadow: 10px 10px 16px 0px rgba(57,57,245,1);
     box-shadow: 10px 10px 16px 0px rgba(57,57,245,1);
+} */
+
+/* Estilo da página de login */
+.login-page {
+    background-color: #2c2c2c; /* Fundo cinza escuro */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto', sans-serif; /* Fonte mais moderna */
+    color: #fff;
 }
+
+/* Container de layout dividido */
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+/* Lado esquerdo com os materiais */
+.left-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Logo da ProtecLend */
+.logo-section h2 {
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+/* Materiais dispostos horizontalmente */
+.materials-static {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+/* Martelo */
+.hammer {
+    position: relative;
+    width: 50px;
+    height: 100px;
+}
+
+.hammer-head {
+    width: 60px;
+    height: 20px;
+    background-color: gray;
+    position: absolute;
+    top: 0;
+    left: -15px;
+    border-radius: 3px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.hammer-handle {
+    width: 10px;
+    height: 80px;
+    background-color: #8B4513;
+    position: absolute;
+    top: 20px;
+    left: 15px;
+}
+/* Chave Felipe */
+.key {
+    position: relative;
+    width: 150px; /* Largura da chave */
+    height: 60px; /* Altura da chave */
+    background-color: #FFD700; /* Cor da chave */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Parte superior da chave */
+.key-head {
+    width: 50px; /* Largura da parte superior */
+    height: 20px; /* Altura da parte superior */
+    background-color: #DAA520; /* Cor da parte superior */
+    border-radius: 5px; /* Bordas arredondadas */
+    position: absolute;
+    top: -10px; /* Posiciona acima da chave */
+    left: 25px; /* Centraliza a parte superior */
+}
+
+/* Parte da lâmina da chave */
+.key-blade {
+    width: 100%; /* Largura da lâmina */
+    height: 40px; /* Altura da lâmina */
+    position: absolute;
+    bottom: 0; /* Posiciona na parte inferior */
+    left: 0; /* Alinha à esquerda */
+    background-color: #FFD700; /* Mesma cor da chave */
+}
+
+/* Materiais saindo da chave */
+.material {
+    position: absolute;
+    background-color: #FFC107; /* Cor dos materiais */
+    border: 2px solid #FF9800; /* Borda dos materiais */
+    border-radius: 5px; /* Bordas arredondadas */
+}
+
+
+/* Capacete */
+.helmet {
+    width: 100px;
+    height: 50px;
+    background-color: yellow;
+    border-radius: 100px 100px 0 0;
+    position: relative;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.helmet::before {
+    content: "";
+    position: absolute;
+    top: 45px;
+    left: 30px;
+    width: 40px;
+    height: 10px;
+    background-color: #d4a017;
+    border-radius: 5px;
+}
+
+/* Caixa de login */
+.my_class {
+    background-color: #f7f7f7;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    max-width: 400px;
+    transition: all 0.3s ease; /* Transição suave */
+}
+
+/* Botão de Login */
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+/* Feedback ao pressionar */
+.btn-success:active {
+    background-color: #1e7e34;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}
+
+/* Estilo de alerta */
+.alert-warning {
+    background-color: #ffc107;
+    color: #212529;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Transição de fade out */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    .left-section, .right-section {
+        width: 100%;
+    }
+}
+

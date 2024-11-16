@@ -3,32 +3,30 @@
 {% block title %}Cadastro Colaborador{% endblock title %}
 
 {% block content %}
-   
 {% if messages %}
-    <div class="alert alert-dismissible fade show" role="alert">
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    </div>
-    <style>
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                display: none;
-            }
-        }
-    </style>
-
+<div class="alert-container">
+    {% for message in messages %}
+        {% if 'colaborador' in message.tags %}
+            <div class="alert alert-{{ message.tags }}">
+                <strong>{{ message.tags|capfirst }}:</strong> {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
 {% endif %}
-<div class="container justify-content-center mt-4">
+
+    <div class="container justify-content-center mt-4">
         <div class="card my_class" style="max-width: 500px; margin: auto;">
             <div class="card-header text-center">
                 <h1>Cadastrar Colaborador</h1>
             </div>
-            <div class="card-body">
+                
+                <div class="card-body">
+                
+                {% if ultimo_nome %}
+                    <p>Nome do ultimo colaborador cadastrado: {{ ultimo_nome }}</p>
+                {% endif %}
+    
                 <form action="/adicionar/" method="post">
                     {% csrf_token %}
                     <div class="form-group mb-2">

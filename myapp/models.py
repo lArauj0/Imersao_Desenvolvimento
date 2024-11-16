@@ -38,10 +38,12 @@ class Equipamento(models.Model):
 
 class Emprestimo(models.Model):
     data_emprestimo = models.DateField()
-    data_devolucao = models.DateField()
+    data_prevista_devolucao = models.DateField(null=True)
+    data_devolucao = models.DateField(null=True)
     colaborador = models.ForeignKey(Colaborador, on_delete=models.CASCADE)
     equipamento = models.ForeignKey(Equipamento, on_delete=models.CASCADE)
     quantidade_equipamento = models.IntegerField(null=True)
+    observacao = models.TextField(null=True)
     status = models.BooleanField()
 
     def clean(self):
