@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Listas{% endblock %}</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        /* Estilos para a sidebar */
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            background-color: #f8f9fa;
+            z-index: 1000; /* Sidebar fica acima do conteúdo */
+            transition: transform 0.3s ease;
+        }
+
+        /* Estilo para o conteúdo principal */
+        .content {
+            margin-left: 250px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-250px); /* Esconde a sidebar movendo-a para a esquerda */
+        }
+
+        .content.shifted {
+            margin-left: 0; /* Ajusta o conteúdo quando a sidebar é escondida */
+        }
+
+        /* Responsividade (se necessário) */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
+            }
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Navegação do header -->
+        <nav class="navbar navbar-expand-sm bg-light justify-content-center">
+            <ul class="navbar-nav ms-auto">
+                {% if request.user.is_authenticated %}
+                <li class="nav-item">
+                    <p class="nav-link" id="userName">{{ request.user.username }}</p>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout_usuario' %}">Logout</a>
+                </li>
+                <li class="nav-item" id="userProfile">
+                    {% if request.user.profile.foto_url %}
+                    <img src="{{ request.user.profile.foto_url }}" alt="Foto de {{ request.user.username }}" class="user-photo" id="userPhoto" style="width: 50px; height: 50px; border-radius: 50%; cursor: pointer;">
+                    {% elif request.user.profile.profile_image %}
+                    {% else %} 
+                        <p class="nav-link">Foto não disponível.</p>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login_usuario' %}">Login</a>
+                </li>      
+                {% endif %}
+            </ul>
+        </nav>
+        <!-- Navegação do header -->
+    </header>
+
+    <div id="userInfoModal" class="user-info-modal" style="display:none;">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <img src="{{ request.user.profile.foto_url }}" alt="Foto de {{ request.user.username }}" class="modal-user-photo" style="width: 100px; height: 100px; border-radius: 50%;">
+            <p><strong>Usuario:</strong> {{ request.user.username }}</p>
+            <p><strong>Email:</strong> {{ request.user.email }}</p>
+            <p><strong>Nome:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
+            <p><strong>Idade:</strong>{{ request.user.profile.data_nascimento }}</p>
+        </div>
+    </div>
+
+    <div class="d-flex">
+        <!-- Barra lateral (sidebar) -->
+        <aside class="sidebar bg-light border-right w3-sidebar w3-bar-block w3-light-grey w3-card">
+            <a href="{% url 'home' %}" class="w3-bar-item w3-button">Tela Principal</a>
+
+            <button class="w3-button w3-block w3-left-align" onclick="myAccFunc()">
+                Equipamento EPI <i class="fa fa-caret-down"></i>
+            </button>
+            <div id="demoAcc" class="w3-hide w3-white w3-card">
+                <a href="{% url 'criar_equipamento' %}" class="w3-bar-item w3-button">Criar Equipamento</a>
+                <a href="{% url 'listar_equipamento' %}" class="w3-bar-item w3-button">Listar Equipamentos</a>
+            </div>
+
+            <div class="w3-dropdown-click">
+                <button class="w3-button" onclick="myDropFunc()">
+                    Colaboradores <i class="fa fa-caret-down"></i>
+                </button>
+                <div id="demoDropColaboradores" class="w3-dropdown-content w3-bar-block w3-white w3-card">
+                    <a href="{% url 'criar_colaborador' %}" class="w3-bar-item w3-button">Criar Colaborador</a>
+                    <a href="{% url 'listar_colaborador' %}" class="w3-bar-item w3-button">Listar Colaboradores</a>
+                </div>
+            </div>
+
+            <div class="w3-dropdown-click">
+                <button class="w3-button" onclick="myDropFun()">
+                    Empréstimos <i class="fa fa-caret-down"></i>
+                </button>
+                <div id="demoDropEmprestimos" class="w3-dropdown-content w3-bar-block w3-white w3-card">
+                    <a href="{% url 'emprestimo' %}" class="w3-bar-item w3-button">Criar Empréstimo</a>
+                    <a href="{% url 'listar_emprestimo' %}" class="w3-bar-item w3-button">Listar Empréstimos</a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Conteúdo principal -->
+        <div class="content flex-grow-1">
+            <!-- Botão para mostrar/esconder a barra lateral -->
+            <button class="btn btn-secondary" onclick="toggleSidebar()">Barra Lateral</button>
+
+            <!-- Conteúdo da página específica -->
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <script>
+        // Função para mostrar e esconder a sidebar
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            sidebar.classList.toggle('hidden');
+            content.classList.toggle('shifted');
+        }
+
+        // Funções para dropdowns (não alterei as funções originais)
+        function myAccFunc() {
+            var x = document.getElementById("demoAcc");
+            if (x.className.indexOf("w3-show") == -1) {
+                x.className += " w3-show";
+                x.previousElementSibling.className += " w3-green";
+            } else {
+                x.className = x.className.replace(" w3-show", "");
+                x.previousElementSibling.className = x.previousElementSibling.className.replace(" w3-green", "");
+            }
+        }
+
+        function myDropFunc() {
+            var x = document.getElementById("demoDropColaboradores");
+            if (x.className.indexOf("w3-show") == -1) {
+                x.className += " w3-show"; // Exibe o dropdown de colaboradores
+                x.previousElementSibling.className += " w3-green"; // Altera a cor do botão
+            } else {
+                x.className = x.className.replace(" w3-show", ""); // Esconde o dropdown de colaboradores
+                x.previousElementSibling.className = x.previousElementSibling.className.replace(" w3-green", ""); // Restaura a cor do botão
+            }
+        }
+
+        function myDropFun() {
+            var y = document.getElementById("demoDropEmprestimos");
+            if (y.className.indexOf("w3-show") == -1) {
+                y.className += " w3-show"; // Exibe o dropdown de empréstimos
+                y.previousElementSibling.className += " w3-green"; // Altera a cor do botão
+            } else {
+                y.className = y.className.replace(" w3-show", ""); // Esconde o dropdown de empréstimos
+                y.previousElementSibling.className = y.previousElementSibling.className.replace(" w3-green", ""); // Restaura a cor do botão
+            }
+        }
+        
+        
+        document.addEventListener('DOMContentLoaded', function () {
+    const userPhoto = document.getElementById('userPhoto'); // A imagem do perfil
+    const userInfoModal = document.getElementById('userInfoModal'); // O modal de informações
+    const closeModal = document.getElementById('closeModal'); // Botão de fechar
+
+    // Mostrar ou esconder o modal quando clicar na foto do usuário
+    if (userPhoto) {
+        userPhoto.addEventListener('click', function () {
+            // Alternar entre exibir e ocultar o modal
+            userInfoModal.style.display = (userInfoModal.style.display === 'flex') ? 'none' : 'flex';
+        });
+    }
+
+    // Fechar o modal ao clicar no "X"
+    if (closeModal) {
+        closeModal.addEventListener('click', function () {
+            userInfoModal.style.display = 'none'; // Ocultar o modal
+        });
+    }
+
+    // Fechar o modal se clicar fora dele
+    window.addEventListener('click', function (event) {
+        if (event.target === userInfoModal) {
+            userInfoModal.style.display = 'none'; // Ocultar o modal
+        }
+    });
+});
+    </script>
+</body>
+</html>
