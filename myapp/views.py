@@ -23,11 +23,8 @@ def listar_emprestimo(request):
         ) | Emprestimo.objects.select_related('colaborador', 'equipamento').filter(
             colaborador__nome__icontains=nome
         )
-        
-        # Filtra equipamentos com base no nome
-        values_equipamentos = Equipamento.objects.filter(
-            nome__icontains=nome
-        )
+        values_equipamentos = Equipamento.objects.filter(nome__icontains=nome)
+        values_colaboradores = Colaborador.objects.filter(nome__icontains=nome)
     else:
         values = Emprestimo.objects.select_related('colaborador', 'equipamento').all()
         values_equipamentos = Equipamento.objects.all()
@@ -57,6 +54,16 @@ def listar_emprestimo(request):
             'quantidade': value.quantidade,
         }
         equipamentos.append(equipamento)
+
+    # Processa os colaboradores filtrados
+    colaboradores = []
+    for value in values_colaboradores:
+        colaborador = {
+            'id': value.id,
+            'nome': value.nome,
+            'email': value.email,
+        }
+        colaboradores.append(colaborador)
 
     context = {
         'lista_emprestimo': emprestimos,
