@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 
 
-# Create your views here.
 from django.shortcuts import render
 from .models import Emprestimo, Colaborador, Equipamento
 
@@ -64,7 +63,6 @@ def listar_emprestimo(request):
             'email': value.email,
         }
         colaboradores.append(colaborador)
-
     context = {
         'lista_emprestimo': emprestimos,
         'lista_equipamentos': equipamentos,
@@ -76,20 +74,36 @@ def listar_emprestimo(request):
 @login_required(login_url='/login/login/')
 @permission_required('myapp.criar_colaboradores',login_url='/login/login/', raise_exception=True)
 def criar_colaborador(request):
+<<<<<<<<< Temporary merge branch 1
     nome = None
     if request.method == 'POST':
         nome = request.POST.get('nome')
         data_nascimento = request.POST.get('data_nascimento')  # Captura a data de nascimento
         email = request.POST.get('email')
         
-        if nome and email and data_nascimento:  # Verifica se todos os campos estão preenchidos
-            try:
-                colaborador = Colaborador(nome=nome, email=email, data_nascimento=data_nascimento)
-                colaborador.save()
-                messages.success(request, 'Colaborador cadastrado com sucesso!')
-                return redirect('home')  # Redireciona para a página inicial ou outra página
-            except Exception:
-                ...
+        if nome and data_nascimento and email:
+            # Cria o colaborador com a data de nascimento
+            Colaborador.objects.create(nome=nome, data_nascimento=data_nascimento, email=email)
+            return redirect(listar_emprestimo)
+    
+    return render(request, 'myapp/pages/cadastrar_colaborador.html', {"ultimo_nome": nome})
+
+@login_required(login_url='/login/login/')
+@permission_required('myapp.criar_equipamentos',login_url='/login/login/', raise_exception=True)
+def criar_equipamento(request):
+    nome = None
+=========
+    erro = []  # Lista para armazenar mensagens de erro
+    nome = None
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        data_nascimento = request.POST.get('data_nascimento')
+        email = request.POST.get('email')
+        
+        # Verifica se todos os campos foram preenchidos
+        if not nome or not data_nascimento or not email:
+            erro.append('Todos os campos são obrigatórios!')
         else:
             messages.error(request, 'Por favor, preencha todos os campos.')
             messages.get_messages(request) 
@@ -123,14 +137,36 @@ def deletar_colaborador(request, id):
 @permission_required('myapp.criar_equipamentos',login_url='/login/login/', raise_exception=True)
 def criar_equipamento(request):
     nome = None
+
     if request.method == 'POST':
         nome = request.POST.get('nome')
         tipo = request.POST.get('tipo')
         quantidade = request.POST.get('quantidade')
-        if nome and tipo and quantidade:
-            Equipamento.objects.create(nome=nome, tipo=tipo, quantidade=quantidade)
-            return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
+        
+        # Verifica se todos os campos foram preenchidos
+        if not nome or not tipo or not quantidade:
+            erro.append('Todos os campos são obrigatórios!')
+        else:
+            # Verifica se já existe um equipamento com o mesmo nome e tipo
+            if Equipamento.objects.filter(nome=nome, tipo=tipo).exists():
+                erro.append('Equipamento já cadastrado com este nome e tipo!')
+            else:
+                # Cria o equipamento se não houver duplicidade
+                Equipamento.objects.create(nome=nome, tipo=tipo, quantidade=quantidade)
+                messages.success(request, 'Equipamento cadastrado com sucesso!', extra_tags='equipamento')
+                return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})  # Redireciona para a lista de equipamentos
+
+        # Se houver erros, renderiza a página novamente com as mensagens
+        for msg in erro:
+            messages.error(request, msg, extra_tags='equipamento')
+
+        return render(request, 'myapp/pages/cadastrar_equipamento.html', {
+            "ultimo_nome": nome,
+        })
+    
     return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
+
+
 
 @login_required(login_url='/login/login/')
 @permission_required('myapp.atualizar_equipamentos' ,login_url='/login/login/', raise_exception=True)
@@ -148,7 +184,9 @@ def atualizar_equipamento(request, id):
             except ValueError:
                 return render(request, 'myapp/pages/atualizar_equipamento.html', {
                     "item": item,
-                    "erro": "A quantidade deve ser um número válido."
+                    "erro": "A quantidade deve ser um número válido.",
+                    "itemTipo": itemTipo,
+                    "itemQuantidade": itemQuantidade_str  # Retorna o valor de quantidade inserido pelo usuário
                 })
 
             # Atualiza os atributos do item
@@ -161,10 +199,14 @@ def atualizar_equipamento(request, id):
         else:
             return render(request, 'myapp/pages/atualizar_equipamento.html', {
                 "item": item,
-                "erro": "Por favor, preencha todos os campos."
+                "erro": "Por favor, preencha todos os campos.",
+                "itemTipo": itemTipo,
+                "itemQuantidade": itemQuantidade_str  # Retorna o valor de quantidade inserido pelo usuário
             })
 
     return render(request, 'myapp/pages/atualizar_equipamento.html', {"item": item})
+
+
 
 @login_required(login_url='/login/login/')
 @permission_required('myapp.deletar_equipamentos',login_url='/login/login/', raise_exception=True)
@@ -182,76 +224,78 @@ def criar_emprestimo(request):
     if request.method == 'GET':
         colaboradores = Colaborador.objects.all()
         equipamentos = Equipamento.objects.all()
-        return render(request, 'myapp/pages/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
+        return render(request, 'myapp/pages/cadastrar_emprestimo.html', {
+            "colaboradores": colaboradores,
+            "equipamentos": equipamentos
+        })
 
     elif request.method == 'POST':
         data_emprestimo = request.POST.get('data_emprestimo')
-        data_devolucao = request.POST.get('data_devolucao')
+        data_prevista_devolucao = request.POST.get('data_prevista_devolucao')
         colaborador = request.POST.get('colaborador')
         equipamento = request.POST.get('equipamento')
         quantidade_equipamento_str = request.POST.get('quantidade_equipamento')
         status_str = request.POST.get('status')
 
-        messages = []  # Lista para armazenar mensagens de erro
+        erro = []
 
-        # Verifica se a quantidade foi fornecida
         if not quantidade_equipamento_str:
-            messages.append("Por favor, forneça a quantidade de equipamentos.")
+            erro.append("Por favor, forneça a quantidade de equipamentos.")
         else:
-            # Converte para inteiro e verifica se a conversão foi bem-sucedida
             try:
                 quantidade_equipamento = int(quantidade_equipamento_str)
             except ValueError:
-                messages.append("Quantidade deve ser um número válido.")
+                erro.append("Quantidade deve ser um número válido.")
                 quantidade_equipamento = 0
 
-        # Verifica se a data de devolução não é anterior à data de empréstimo
-        if data_emprestimo >= data_devolucao: 
-            messages.append("A data de devolução não pode ser anterior à data de empréstimo.")
+        if data_emprestimo and data_prevista_devolucao and data_emprestimo >= data_prevista_devolucao:
+            erro.append("A data prevista de devolução não pode ser anterior à data de empréstimo.")
 
-        # Obtém a quantidade do equipamento disponível
-        equipamento_obj = Equipamento.objects.get(id=equipamento)
-        qnt_equipamento_db = equipamento_obj.quantidade
-        
-        # Verifica se a quantidade desejada é maior que a disponível
-        if quantidade_equipamento > qnt_equipamento_db:
-            messages.append("Quantidade de equipamentos insuficientes.")
+        try:
+            equipamento_id = int(equipamento)
+            equipamento_obj = Equipamento.objects.get(id=equipamento_id)
+            qnt_equipamento_db = equipamento_obj.quantidade
+        except (ValueError, Equipamento.DoesNotExist):
+            erro.append("Equipamento não encontrado.")
 
-        # Se houver mensagens de erro, renderiza a página novamente com mensagens
-        if messages:
-            colaboradores = Colaborador.objects.all()  # Recarrega os colaboradores
-            equipamentos = Equipamento.objects.all()  # Recarrega os equipamentos
+        if 'qnt_equipamento_db' in locals() and quantidade_equipamento > qnt_equipamento_db:
+            erro.append("Quantidade de equipamentos insuficiente.")
+
+        if erro:
+            for msg in erro:
+                messages.error(request, msg, extra_tags='emprestimo')
+            colaboradores = Colaborador.objects.all()
+            equipamentos = Equipamento.objects.all()
             return render(request, 'myapp/pages/cadastrar_emprestimo.html', {
                 "colaboradores": colaboradores,
-                "equipamentos": equipamentos,
-                "messages": messages
+                "equipamentos": equipamentos
             })
 
-        # Converte o status de string para booleano
         status = status_str == "Emprestado"
 
-        # Cria o empréstimo
         emprestimo = Emprestimo.objects.create(
             data_emprestimo=data_emprestimo,
-            data_devolucao=data_devolucao,
+            data_prevista_devolucao=data_prevista_devolucao,
             colaborador_id=colaborador,
-            equipamento_id=equipamento,
+            equipamento_id=equipamento_id,
             status=status,
             quantidade_equipamento=quantidade_equipamento
         )
 
-        # Atualiza a quantidade do equipamento
-        if status:  # se for Emprestado
+        if status:
             equipamento_obj.quantidade -= quantidade_equipamento
-        else:  # se for Devolvido
+        else:
             equipamento_obj.quantidade += quantidade_equipamento
         
-        # Salva as alterações no equipamento
         equipamento_obj.save()
-        
-        return redirect(listar_emprestimo)
+
+        messages.success(request, 'Empréstimo registrado com sucesso!', extra_tags='emprestimo')
+
+        return render(request, 'myapp/pages/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
 
     return render(request, 'myapp/pages/cadastrar_emprestimo.html', {"colaboradores": colaboradores, "equipamentos": equipamentos})
+
+
 
 @login_required(login_url='/login/login/')
 @permission_required('myapp.atualizar_emprestimos',login_url='/login/login/', raise_exception=True)
@@ -261,39 +305,64 @@ def atualizar_emprestimo(request, id):
 
     if request.method == 'POST':
         status = request.POST.get('status')
+        data_devolucao = request.POST.get('data_devolucao')
+        observacao = request.POST.get('observacao')
 
-        # Verifica se o status foi fornecido
-        if status is not None:
-            # Ajuste a quantidade de equipamentos com base no status anterior e no novo status
+        # Verifica se todos os campos obrigatórios estão preenchidos
+        if not status:
+            erro = "Por favor, selecione um status."
+        elif status in ['Devolvido', 'Danificado', 'Perdido'] and (not data_devolucao or not observacao):
+            erro = "Por favor, preencha a data de devolução e/ou observação."
+        else:
+            erro = None
+
+        # Se houver erro, reexibe o formulário com a mensagem de erro
+        if erro:
+            return render(request, 'myapp/pages/atualizar_emprestimo.html', {"item": emprestimo, "erro": erro})
+
+        try:
+            # Ajusta a quantidade de equipamentos com base no status anterior e no novo status
             if emprestimo.status:  # Status atual é 'Emprestado'
-                if status == 'Devolvido':
-                    # Se está mudando para 'Devolvido', aumenta a quantidade
+                if status == 'Devolvido' or status == 'Danificado' or status == 'Perdido':
+                    # Se está mudando para 'Devolvido', 'Danificado' ou 'Perdido', aumenta a quantidade
                     equipamento.quantidade += emprestimo.quantidade_equipamento
-            else:  # Status atual é 'Devolvido'
+            else:  # Status atual é 'Devolvido', 'Danificado' ou 'Perdido'
                 if status == 'Emprestado':
-                    # Se está mudando para 'Emprestado', diminui a quantidade
-                    equipamento.quantidade -= emprestimo.quantidade_equipamento
+                    if equipamento.quantidade >= emprestimo.quantidade_equipamento:
+                        equipamento.quantidade -= emprestimo.quantidade_equipamento
+                    else:
+                        erro = "Não há quantidade suficiente de equipamentos para emprestar."
+                        return render(request, 'myapp/pages/atualizar_emprestimo.html', {"item": emprestimo, "erro": erro})
 
             # Atualiza o status do empréstimo
             emprestimo.status = (status == 'Emprestado')  # Converte o status para booleano
-            
-            # Salva as alterações no empréstimo e no equipamento
+
+            if status in ['Devolvido', 'Danificado', 'Perdido']:
+                emprestimo.data_devolucao = data_devolucao
+                emprestimo.observacao = observacao
+
             emprestimo.save()
             equipamento.save()
 
-            return redirect(listar_emprestimo)  # Redireciona para a lista de empréstimos
-        else:
-            return render(request, 'myapp/pages/atualizar_emprestimo.html', {
-                "item": emprestimo,
-                "erro": "Por favor, selecione um status."
-            })
+            return redirect('listar_emprestimo')  # Redireciona para a lista de empréstimos
+
+        except Exception as e:
+            erro = f'Ocorreu um erro ao atualizar o empréstimo: {e}'
+            return render(request, 'myapp/pages/atualizar_emprestimo.html', {"item": emprestimo, "erro": erro})
 
     return render(request, 'myapp/pages/atualizar_emprestimo.html', {"item": emprestimo})
+
+@login_required(login_url='/login/login/')
+@permission_required('myapp.atualizar_emprestimos',login_url='/login/login/', raise_exception=True)
+def deletar_emprestimo(request, id):
+    emprestimo = Emprestimo.objects.get(id=id)
+    emprestimo.delete()
+    return redirect('listar_emprestimo')
+
 
 def lista_colaboradores(request):
     colaboradores = Colaborador.objects.all()
     nome = request.GET.get('nome')
-    print(nome)
     if nome:
         colaboradores = colaboradores.filter(nome__icontains=nome)
 
@@ -331,3 +400,5 @@ def list_emprestimo(request):
 
 def home(request):
     return render(request, 'myapp/pages/listar.html')
+
+

@@ -13,6 +13,5 @@ urlpatterns = [
     path('deletar_colaborador/<int:id>/', views.deletar_colaborador, name='deletar_colaborador'),
     path('listar_equipamento/', views.listar_equipamento, name='listar_equipamento'),
     path('listar_colaborador/', views.listar_colaborador, name='listar_colaborador'),
-    path('listar_emprestimo/', views.listar_emprestimo, name='listar_emprestimo'),
-       
+    path('listar_emprestimo/', views.listar_emprestimo, name='listar_emprestimo'), 
 ]

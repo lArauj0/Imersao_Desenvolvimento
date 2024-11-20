@@ -1,30 +1,45 @@
 <nav class="navbar navbar-expand-sm bg-light justify-content-center">
-    <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-            <a class="nav-link" href="/">Lista</a>
-        </li>      
-        <li class="nav-item">
-            <a class="nav-link" href="/emprestimo">Fazer Empréstimo</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/adicionar">Cadastrar Colaborador</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/criar_equipamento">Cadastrar Equipamento</a>
-        </li>
-    </ul>
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Lista</a>
+            </li>      
+            <li class="nav-item">
+                <a class="nav-link" href="/emprestimo">Fazer Emprestimo</a"></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/adicionar">Cadastrar Colaborador</a>
+            </li>
+            <li class = "nav-item">
+                <a class="nav-link" href="/criar_equipamento">Cadastrar Equipamento</a"></a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+            {% if request.user.is_authenticated %}
+            <li class="nav-item">
+               <p class="nav-link">{{ request.user.username }}</p>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'logout_usuario' %}">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'login_usuario' %}">Login</a>
+            </li>      
+            {% endif %}
+        </ul>
     <ul class="navbar-nav ms-auto">
         {% if request.user.is_authenticated %}
         <li class="nav-item">
-            <p class="nav-link">{{ request.user.username }}</p>
+            <p class="nav-link" id="userName">{{ request.user.username }}</p>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'logout_usuario' %}">Logout</a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item" id="userProfile">
             {% if request.user.profile.foto_url %}
-                <img src="{{ request.user.profile.foto_url }}" alt="Foto de {{ request.user.username }}" style="width: 50px; height: 50px; border-radius: 50%;">
-            {% else %}
+            <img src="{{ request.user.profile.foto_url }}" alt="Foto de {{ request.user.username }}" class="user-photo" id="userPhoto" style="width: 50px; height: 50px; border-radius: 50%; cursor: pointer;">
+            {% elif request.user.profile.profile_image %}
+            {% else %} 
                 <p class="nav-link">Foto não disponível.</p>
             {% endif %}
         </li>
@@ -35,3 +50,48 @@
         {% endif %}
     </ul>
 </nav>
+
+<!-- Modal de Informações do Usuário -->
+<div id="userInfoModal" class="user-info-modal" style="display:none;">
+    <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <img src="{{ request.user.profile.foto_url }}" alt="Foto de {{ request.user.username }}" class="modal-user-photo" style="width: 100px; height: 100px; border-radius: 50%;">
+        <p><strong>Usuario:</strong> {{ request.user.username }}</p>
+        <p><strong>Email:</strong> {{ request.user.email }}</p>
+        <p><strong>Nome:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const userPhoto = document.getElementById('userPhoto'); // A imagem do perfil
+    const userInfoModal = document.getElementById('userInfoModal'); // O modal de informações
+    const closeModal = document.getElementById('closeModal'); // Botão de fechar
+
+    // Mostrar ou esconder o modal quando clicar na foto do usuário
+    if (userPhoto) {
+        userPhoto.addEventListener('click', function () {
+            // Alternar entre exibir e ocultar o modal
+            userInfoModal.style.display = (userInfoModal.style.display === 'flex') ? 'none' : 'flex';
+        });
+    }
+
+    // Fechar o modal ao clicar no "X"
+    if (closeModal) {
+        closeModal.addEventListener('click', function () {
+            userInfoModal.style.display = 'none'; // Ocultar o modal
+        });
+    }
+
+    // Fechar o modal se clicar fora dele
+    window.addEventListener('click', function (event) {
+        if (event.target === userInfoModal) {
+            userInfoModal.style.display = 'none'; // Ocultar o modal
+        }
+    });
+});
+
+
+</script>

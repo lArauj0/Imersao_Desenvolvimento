@@ -14,7 +14,7 @@
                     <div class="alert alert-info">{{ message }}</div>
                 {% endfor %}
             {% endif %}
-            <form action="{% url 'criar_usuario' %}" method="post">
+            <form action="{% url 'criar_usuario' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group mb-2">
                     <label for="nome">Nome</label>
@@ -37,9 +37,9 @@
                     <input type="password" class="form-control" name="password" id="password" required>
                 </div>
                 <div class="form-group mb-2">
-                    <label for="foto_url">URL da Foto</label>
-                    <input type="url" class="form-control" name="foto_url" id="foto_url" placeholder="https://exemplo.com/sua_foto.jpg" required>
-                </div>
+                    <label for="profile_image">Imagem de Perfil</label>
+                    <input type="file" class="form-control" name="profile_image" id="profile_image">
+                </div>                
                 <div class="form-group mb-2 text-center">
                     <input class="btn btn-success" type="submit" value="Cadastrar">
                 </div>

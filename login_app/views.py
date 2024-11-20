@@ -7,6 +7,11 @@ from django.contrib.auth.models import Group, Permission
 # login_app/views.py
 from django.contrib import messages
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from .models import Profile
+from django.core.files.storage import FileSystemStorage
+
 def criar_usuario(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
@@ -14,23 +19,26 @@ def criar_usuario(request):
         email = request.POST.get('email')
         username = request.POST.get('username')
         password = request.POST.get('password')
-        foto_url = request.POST.get('foto_url')  # Pega a URL da foto
+        profile_image = request.FILES.get('profile_image')  # Verifica o arquivo
 
-        # Criar o usuário
-        try:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user.first_name = nome
-            user.last_name = sobrenome
-            user.profile.foto_url = foto_url  # Salvar a URL da foto no campo do perfil
-            user.save()
+        if all([nome, sobrenome, email, username, password]):
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                first_name=nome,
+                last_name=sobrenome 
+            )
+            profile = Profile(user=user, profile_image=profile_image)
+            profile.save()
 
-            messages.success(request, 'Usuário cadastrado com sucesso!')
-            return redirect('listar_emprestimo')  # Redireciona para a página inicial ou outra página após o cadastro
-        except Exception as e:
-            messages.error(request, 'Erro ao cadastrar o usuário: {}'.format(e))
+            messages.success(request, 'Usuário criado com sucesso!')
+        else:
+            messages.error(request, 'Preencha todos os campos obrigatórios.')
 
-    print("Acessou a view criar_usuario")
+        return redirect('login_usuario')
     return render(request, 'login_app/pages/cadastrar.html')
+
 
 def login_usuario(request):
     if request.method == 'POST':
