@@ -10,25 +10,25 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 from .models import Emprestimo, Colaborador, Equipamento
 
+from django.shortcuts import render
+from .models import Emprestimo, Equipamento, Colaborador
+
 def listar_emprestimo(request):
     nome = request.GET.get('nome', '').strip()  # Pega o valor da pesquisa
 
-    # Usar select_related para otimizar consultas
+    # Filtra empréstimos com base no nome do equipamento ou colaborador
     if nome:
-        # Filtra empréstimos com base no nome do equipamento ou colaborador
         values = Emprestimo.objects.select_related('colaborador', 'equipamento').filter(
             equipamento__nome__icontains=nome
         ) | Emprestimo.objects.select_related('colaborador', 'equipamento').filter(
             colaborador__nome__icontains=nome
         )
-        
-        # Filtra equipamentos com base no nome
-        values_equipamentos = Equipamento.objects.filter(
-            nome__icontains=nome
-        )
+        values_equipamentos = Equipamento.objects.filter(nome__icontains=nome)
+        values_colaboradores = Colaborador.objects.filter(nome__icontains=nome)
     else:
         values = Emprestimo.objects.select_related('colaborador', 'equipamento').all()
         values_equipamentos = Equipamento.objects.all()
+        values_colaboradores = Colaborador.objects.all()
 
     # Processa os empréstimos filtrados
     emprestimos = []
@@ -37,8 +37,8 @@ def listar_emprestimo(request):
             'id': value.id,
             'data_emprestimo': value.data_emprestimo,
             'data_devolucao': value.data_devolucao,
-            'colaborador': value.colaborador.nome,  # Objeto completo já obtido por select_related
-            'equipamento': value.equipamento.nome,  # Objeto completo já obtido por select_related
+            'colaborador': value.colaborador.nome,
+            'equipamento': value.equipamento.nome,
             'quantidade_equipamento': value.quantidade_equipamento,
             'status': 'Emprestado' if value.status else 'Devolvido',
         }
@@ -55,11 +55,23 @@ def listar_emprestimo(request):
         }
         equipamentos.append(equipamento)
 
+    # Processa os colaboradores filtrados
+    colaboradores = []
+    for value in values_colaboradores:
+        colaborador = {
+            'id': value.id,
+            'nome': value.nome,
+            'email': value.email,
+        }
+        colaboradores.append(colaborador)
+
     context = {
         'lista_emprestimo': emprestimos,
-        'lista_equipamentos': equipamentos
+        'lista_equipamentos': equipamentos,
+        'lista_colaboradores': colaboradores,
     }
-    return render(request, 'myapp/pages/listar.html', context)
+    return render(request, 'myapp/pages/listar_emprestimo.html', context)
+
 
 @login_required(login_url='/login/login/')
 @permission_required('myapp.criar_colaboradores',login_url='/login/login/', raise_exception=True)
@@ -70,12 +82,42 @@ def criar_colaborador(request):
         data_nascimento = request.POST.get('data_nascimento')  # Captura a data de nascimento
         email = request.POST.get('email')
         
-        if nome and data_nascimento and email:
-            # Cria o colaborador com a data de nascimento
-            Colaborador.objects.create(nome=nome, data_nascimento=data_nascimento, email=email)
+        if nome and email and data_nascimento:  # Verifica se todos os campos estão preenchidos
+            try:
+                colaborador = Colaborador(nome=nome, email=email, data_nascimento=data_nascimento)
+                colaborador.save()
+                messages.success(request, 'Colaborador cadastrado com sucesso!')
+                return redirect('home')  # Redireciona para a página inicial ou outra página
+            except Exception:
+                ...
+        else:
+            messages.error(request, 'Por favor, preencha todos os campos.')
+            messages.get_messages(request) 
+
+    return render(request, 'myapp/pages/cadastrar_colaborador.html')
+
+
+@login_required(login_url='/login/login/')
+@permission_required('myapp.atualizar_colaboradores',login_url='/login/login/', raise_exception=True)
+def atualizar_colaborador(request, id):
+    item = Colaborador.objects.get(id=id)
+    if request.method == 'POST':
+        itemNome = request.POST.get('nome')
+        itemEmail = request.POST.get('email') 
+        
+        if itemNome and itemEmail:
+            itemNome = itemNome
+            itemEmail = itemEmail
+            item.save()
             return redirect(listar_emprestimo)
-    
-    return render(request, 'myapp/pages/cadastrar_colaborador.html', {"ultimo_nome": nome})
+    return render(request, 'myapp/pages/atualizar_colaborador.html', {"item": item})
+
+@login_required(login_url='/login/login/')
+@permission_required('myapp.deletar_colaboradores',login_url='/login/login/', raise_exception=True)
+def deletar_colaborador(request, id):
+    item = Colaborador.objects.get(id=id)
+    item.delete()
+    return redirect(listar_emprestimo)
 
 @login_required(login_url='/login/login/')
 @permission_required('myapp.criar_equipamentos',login_url='/login/login/', raise_exception=True)
@@ -87,8 +129,7 @@ def criar_equipamento(request):
         quantidade = request.POST.get('quantidade')
         if nome and tipo and quantidade:
             Equipamento.objects.create(nome=nome, tipo=tipo, quantidade=quantidade)
-            messages.success(request, 'Equipamento cadastrado com sucesso!')
-            return redirect(listar_emprestimo)
+            return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
     return render(request, 'myapp/pages/cadastrar_equipamento.html', {"ultimo_nome": nome})
 
 @login_required(login_url='/login/login/')
@@ -115,7 +156,7 @@ def atualizar_equipamento(request, id):
             item.tipo = itemTipo  # Atribuição correta do tipo
             item.quantidade = itemQuantidade  # Atribuição correta da quantidade
             item.save()  # Salva as alterações no banco de dados
-            
+
             return redirect(listar_emprestimo)  # Redireciona para a lista de empréstimos
         else:
             return render(request, 'myapp/pages/atualizar_equipamento.html', {
@@ -252,11 +293,11 @@ def atualizar_emprestimo(request, id):
 def lista_colaboradores(request):
     colaboradores = Colaborador.objects.all()
     nome = request.GET.get('nome')
-    print("aleluia")
+    print(nome)
     if nome:
         colaboradores = colaboradores.filter(nome__icontains=nome)
 
-    return colaboradores
+    return render(request, 'myapp/pages/listar.html', {"colaboradores": colaboradores})
 
 
 def lista_equipamentos(request):
@@ -266,3 +307,27 @@ def lista_equipamentos(request):
         equipamentos = equipamentos.filter(nome__icontains=nome)
 
     return render(request, 'myapp/pages/listar.html', {"equipamentos": equipamentos})
+
+def listar_equipamento(request):
+    equipamentos = Equipamento.objects.all()
+    context = {
+        'lista_equipamentos': equipamentos,
+    }
+    return render(request, 'myapp/pages/listar_equipamento.html', context)
+
+def listar_colaborador(request):
+    colaboradores = Colaborador.objects.all()
+    context = {
+        'lista_colaboradores': colaboradores,
+    }
+    return render(request, 'myapp/pages/listar_coloborador.html', context)
+
+def list_emprestimo(request):
+    emprestimos = Emprestimo.objects.all()
+    context = {
+        'lista_emprestimos': emprestimos,
+    }
+    return render(request, 'myapp/pages/listar_emprestimo.html', context)
+
+def home(request):
+    return render(request, 'myapp/pages/listar.html')
