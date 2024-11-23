@@ -74,7 +74,6 @@ def listar_emprestimo(request):
 @login_required(login_url='/login/login/')
 @permission_required('myapp.criar_colaboradores',login_url='/login/login/', raise_exception=True)
 def criar_colaborador(request):
-<<<<<<<<< Temporary merge branch 1
     nome = None
     if request.method == 'POST':
         nome = request.POST.get('nome')
@@ -92,7 +91,7 @@ def criar_colaborador(request):
 @permission_required('myapp.criar_equipamentos',login_url='/login/login/', raise_exception=True)
 def criar_equipamento(request):
     nome = None
-=========
+
     erro = []  # Lista para armazenar mensagens de erro
     nome = None
 
@@ -138,6 +137,7 @@ def deletar_colaborador(request, id):
 def criar_equipamento(request):
     nome = None
 
+    erro = []  # Lista para armazenar mensagens de erro
     if request.method == 'POST':
         nome = request.POST.get('nome')
         tipo = request.POST.get('tipo')
